@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能单词记忆助手 - 默认加载c.txt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .sidebar {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .content-area {
+            flex: 2;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #6a11cb;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            background-color: #f8f9ff;
+            border-color: #2575fc;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #6a11cb;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 10px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4cd964 0%, #5ac8fa 100%);
+            box-shadow: 0 4px 10px rgba(76, 217, 100, 0.3);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 6px 15px rgba(76, 217, 100, 0.4);
+        }
+        
+        .mode-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .mode-btn {
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .mode-btn:hover {
+            background-color: #e9ecef;
+            border-color: #6a11cb;
+        }
+        
+        .mode-btn.active {
+            background-color: #e8f0fe;
+            border-color: #6a11cb;
+            color: #6a11cb;
+        }
+        
+        .flashcard {
+            perspective: 1000px;
+            width: 100%;
+            height: 350px;
+            margin: 0 auto 30px;
+        }
+        
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        
+        .flashcard-front {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+        
+        .flashcard-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+            text-align: left;
+        }
+        
+        .word {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .phonetic {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .pos {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .meaning {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .memory-aid {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            line-height: 1.5;
+        }
+        
+        .review-info {
+            font-size: 1rem;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .hint {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .progress-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        
+        .word-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .word-item {
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        
+        .word-item:last-child {
+            border-bottom: none;
+        }
+        
+        .word-text {
+            font-weight: 500;
+        }
+        
+        .word-meaning {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .word-review-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+        
+        .status-mastered {
+            color: #28a745;
+        }
+        
+        .status-learning {
+            color: #ffc107;
+        }
+        
+        .status-new {
+            color: #6c757d;
+        }
+        
+        .status-review {
+            color: #fd7e14;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .word {
+                font-size: 2.5rem;
+            }
+            
+            .meaning {
+                font-size: 1.2rem;
+            }
+            
+            .flashcard {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>智能单词记忆助手</h1>
+            <p class="subtitle">默认加载c.txt文件 - 艾宾浩斯遗忘曲线复习系统</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2 class="section-title">单词文件</h2>
+                <div id="fileStatus" class="error-message" style="display: none;">
+                    无法加载c.txt文件，请手动上传单词文件
+                </div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📚</div>
+                    <p>点击或拖拽您的txt单词文件到这里</p>
+                    <p class="hint">支持格式：单词 音标 | 词性. 释义 记忆方法</p>
+                    <input type="file" id="fileInput" accept=".txt" style="display: none;">
+                </div>
+                
+                <h2 class="section-title">学习模式</h2>
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="flashcard">闪卡学习</button>
+                    <button class="mode-btn" data-mode="review">复习模式</button>
+                    <button class="mode-btn" data-mode="test">单词测试</button>
+                    <button class="mode-btn" data-mode="spelling">拼写练习</button>
+                </div>
+                
+                <h2 class="section-title">学习进度</h2>
+                <div class="progress-info">
+                    <p>已学习: <span id="learnedCount">0</span> / <span id="totalCount">0</span> 个单词</p>
+                    <div class="progress-bar">
+                        <div class="progress" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <p>掌握程度: <span id="masteryLevel">0%</span></p>
+                    <p>待复习单词: <span id="reviewCount">0</span> 个</p>
+                </div>
+                
+                <h2 class="section-title">单词列表</h2>
+                <div class="word-list" id="wordList">
+                    <p style="text-align: center; color: #6c757d;">正在加载单词...</p>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <h2 class="section-title" id="modeTitle">闪卡学习</h2>
+                
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <div class="word" id="wordFront">正在加载单词...</div>
+                            <div class="review-info" id="reviewInfoFront" style="display: none;"></div>
+                            <p class="hint">点击卡片查看详细信息</p>
+                        </div>
+                        <div class="flashcard-back">
+                            <div class="word" id="wordBack">-</div>
+                            <div class="phonetic" id="wordPhonetic"></div>
+                            <div class="pos" id="wordPos"></div>
+                            <div class="meaning" id="wordMeaning">-</div>
+                            <div class="memory-aid" id="wordMemory"></div>
+                            <div class="review-info" id="reviewInfoBack" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-controls">
+                    <button class="btn" id="prevBtn" disabled>上一个</button>
+                    <button class="btn" id="flipBtn">翻转卡片</button>
+                    <button class="btn" id="nextBtn" disabled>下一个</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" id="markKnownBtn" style="display: none;">认识</button>
+                    <button class="btn btn-secondary" id="markUnknownBtn" style="display: none;">不认识</button>
+                    <button class="btn btn-secondary" id="markMasteredBtn" disabled>标记为已掌握</button>
+                    <button class="btn" id="shuffleBtn" disabled>随机排序</button>
+                    <button class="btn" id="exportBtn" disabled>导出单词表</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>单词记忆助手 &copy; 2025 - 默认加载c.txt文件</p>
+        </footer>
+    </div>
+
+    <script>
+        // 全局变量
+        let wordList = [];
+        let currentIndex = 0;
+        let currentMode = 'flashcard';
+        let wordProgress = JSON.parse(localStorage.getItem('wordProgress')) || {};
+        
+        // 艾宾浩斯遗忘曲线复习间隔（小时）
+        const reviewIntervals = [1, 24, 72, 168, 336, 720]; // 1小时, 1天, 3天, 7天, 14天, 30天
+        
+        // DOM元素
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileStatus = document.getElementById('fileStatus');
+        const flashcard = document.getElementById('flashcard');
+        const wordFront = document.getElementById('wordFront');
+        const wordBack = document.getElementById('wordBack');
+        const wordPhonetic = document.getElementById('wordPhonetic');
+        const wordPos = document.getElementById('wordPos');
+        const wordMeaning = document.getElementById('wordMeaning');
+        const wordMemory = document.getElementById('wordMemory');
+        const reviewInfoFront = document.getElementById('reviewInfoFront');
+        const reviewInfoBack = document.getElementById('reviewInfoBack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const flipBtn = document.getElementById('flipBtn');
+        const markKnownBtn = document.getElementById('markKnownBtn');
+        const markUnknownBtn = document.getElementById('markUnknownBtn');
+        const markMasteredBtn = document.getElementById('markMasteredBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const learnedCount = document.getElementById('learnedCount');
+        const totalCount = document.getElementById('totalCount');
+        const reviewCount = document.getElementById('reviewCount');
+        const progressBar = document.getElementById('progressBar');
+        const masteryLevel = document.getElementById('masteryLevel');
+        const wordListContainer = document.getElementById('wordList');
+        const modeTitle = document.getElementById('modeTitle');
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        
+        // 页面加载时尝试加载c.txt文件
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDefaultFile();
+        });
+        
+        // 尝试加载默认文件c.txt
+        async function loadDefaultFile() {
+            try {
+                const response = await fetch('c.txt');
+                if (!response.ok) {
+                    throw new Error('文件加载失败');
+                }
+                const content = await response.text();
+                processWordContent(content);
+                fileStatus.style.display = 'none';
+            } catch (error) {
+                console.error('无法加载c.txt文件:', error);
+                fileStatus.style.display = 'block';
+                wordFront.textContent = '无法加载c.txt文件';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">请手动上传单词文件</p>';
+            }
+        }
+        
+        // 事件监听
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '#f0f4ff';
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = '';
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'text/plain') {
+                loadWordFile(file);
+            } else {
+                alert('请上传txt格式的文件');
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadWordFile(file);
+            }
+        });
+        
+        flashcard.addEventListener('click', () => {
+            flashcard.classList.toggle('flipped');
+        });
+        
+        flipBtn.addEventListener('click', () => {
+            flashcard.classList.toggle('flipped');
+        });
+        
+        prevBtn.addEventListener('click', showPreviousWord);
+        nextBtn.addEventListener('click', showNextWord);
+        
+        markKnownBtn.addEventListener('click', markAsKnown);
+        markUnknownBtn.addEventListener('click', markAsUnknown);
+        markMasteredBtn.addEventListener('click', markAsMastered);
+        shuffleBtn.addEventListener('click', shuffleWords);
+        exportBtn.addEventListener('click', exportWordList);
+        
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentMode = button.dataset.mode;
+                modeTitle.textContent = getModeTitle(currentMode);
+                updateUIForMode();
+                updateWordList();
+                
+                if (currentMode === 'test' || currentMode === 'spelling') {
+                    alert(`切换到${button.textContent}模式 - 此功能正在开发中`);
+                }
+            });
+        });
+        
+        // 获取模式标题
+        function getModeTitle(mode) {
+            const titles = {
+                'flashcard': '闪卡学习',
+                'review': '复习模式',
+                'test': '单词测试',
+                'spelling': '拼写练习'
+            };
+            return titles[mode] || '学习模式';
+        }
+        
+        // 根据模式更新UI
+        function updateUIForMode() {
+            if (currentMode === 'review') {
+                markKnownBtn.style.display = 'inline-block';
+                markUnknownBtn.style.display = 'inline-block';
+                markMasteredBtn.style.display = 'none';
+                reviewInfoFront.style.display = 'block';
+                reviewInfoBack.style.display = 'block';
+            } else {
+                markKnownBtn.style.display = 'none';
+                markUnknownBtn.style.display = 'none';
+                markMasteredBtn.style.display = 'inline-block';
+                reviewInfoFront.style.display = 'none';
+                reviewInfoBack.style.display = 'none';
+            }
+        }
+        
+        // 加载单词文件
+        function loadWordFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                processWordContent(content);
+                fileStatus.style.display = 'none';
+            };
+            reader.readAsText(file);
+        }
+        
+        // 处理单词内容 - 适配新格式
+        function processWordContent(content) {
+            const lines = content.split('\n');
+            wordList = [];
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (line) {
+                    // 解析格式：单词 音标 | 词性. 释义 记忆方法
+                    const wordData = parseWordLine(line);
+                    if (wordData) {
+                        wordList.push(wordData);
+                    }
+                }
+            });
+            
+            if (wordList.length > 0) {
+                currentIndex = 0;
+                updateFlashcard();
+                updateProgress();
+                updateWordList();
+                
+                // 启用按钮
+                markMasteredBtn.disabled = false;
+                shuffleBtn.disabled = false;
+                exportBtn.disabled = false;
+                
+                alert(`成功加载 ${wordList.length} 个单词`);
+            } else {
+                alert('未找到有效的单词数据，请检查文件格式');
+            }
+        }
+        
+        // 解析单词行数据
+        function parseWordLine(line) {
+            // 格式：单词 音标 | 词性. 释义 记忆方法
+            const parts = line.split('\t');
+            if (parts.length < 2) return null;
+            
+            const word = parts[0].trim();
+            const rest = parts[1].trim();
+            
+            // 分离音标和词性释义部分
+            const phoneticAndPos = rest.split(' | ');
+            if (phoneticAndPos.length < 2) return null;
+            
+            const phonetic = phoneticAndPos[0].trim();
+            const posAndMeaning = phoneticAndPos[1].trim();
+            
+            // 分离词性和释义
+            const posMatch = posAndMeaning.match(/^(\w+\.)\s+(.+)$/);
+            if (!posMatch) return null;
+            
+            const pos = posMatch[1];
+            const meaningAndMemory = posMatch[2];
+            
+            // 分离释义和记忆方法
+            let meaning = meaningAndMemory;
+            let memory = '';
+            
+            // 尝试分离记忆方法（如果有制表符分隔）
+            if (parts.length > 2) {
+                memory = parts[2].trim();
+            } else {
+                // 如果没有制表符分隔，尝试在释义中查找记忆方法
+                const memoryIndex = meaningAndMemory.indexOf('\t');
+                if (memoryIndex !== -1) {
+                    meaning = meaningAndMemory.substring(0, memoryIndex).trim();
+                    memory = meaningAndMemory.substring(memoryIndex + 1).trim();
+                }
+            }
+            
+            return {
+                word: word,
+                phonetic: phonetic,
+                pos: pos,
+                meaning: meaning,
+                memory: memory
+            };
+        }
+        
+        // 更新闪卡内容
+        function updateFlashcard() {
+            if (wordList.length === 0) {
+                wordFront.textContent = '请上传单词文件';
+                wordBack.textContent = '-';
+                wordPhonetic.textContent = '';
+                wordPos.textContent = '';
+                wordMeaning.textContent = '-';
+                wordMemory.textContent = '';
+                reviewInfoFront.textContent = '';
+                reviewInfoBack.textContent = '';
+                return;
+            }
+            
+            const currentWord = wordList[currentIndex];
+            wordFront.textContent = currentWord.word;
+            wordBack.textContent = currentWord.word;
+            wordPhonetic.textContent = currentWord.phonetic;
+            wordPos.textContent = currentWord.pos;
+            wordMeaning.textContent = currentWord.meaning;
+            wordMemory.textContent = currentWord.memory;
+            
+            // 如果没有记忆方法，隐藏该部分
+            if (!currentWord.memory) {
+                wordMemory.style.display = 'none';
+            } else {
+                wordMemory.style.display = 'block';
+            }
+            
+            // 更新复习信息
+            const word = currentWord.word;
+            const progress = wordProgress[word] || { stage: 0, nextReview: 0, lastReviewed: 0 };
+            
+            if (currentMode === 'review') {
+                const now = Date.now();
+                const nextReviewTime = new Date(progress.nextReview);
+                const lastReviewedTime = new Date(progress.lastReviewed);
+                
+                reviewInfoFront.textContent = `复习阶段: ${progress.stage}/6 | 下次复习: ${formatDate(nextReviewTime)}`;
+                reviewInfoBack.textContent = `上次复习: ${formatDate(lastReviewedTime)} | 下次复习: ${formatDate(nextReviewTime)}`;
+            }
+            
+            // 重置卡片状态
+            flashcard.classList.remove('flipped');
+            
+            // 更新按钮状态
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === wordList.length - 1;
+            
+            // 更新已掌握状态
+            const isMastered = progress.stage === 6;
+            markMasteredBtn.textContent = isMastered ? '取消掌握标记' : '标记为已掌握';
+            markMasteredBtn.classList.toggle('btn-secondary', !isMastered);
+        }
+        
+        // 格式化日期
+        function formatDate(date) {
+            if (date.getTime() === 0) return '从未复习';
+            
+            const now = new Date();
+            const diffMs = date - now;
+            const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                return '已过期';
+            } else if (diffDays === 0) {
+                return '今天';
+            } else if (diffDays === 1) {
+                return '明天';
+            } else {
+                return `${diffDays}天后`;
+            }
+        }
+        
+        // 显示上一个单词
+        function showPreviousWord() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateFlashcard();
+            }
+        }
+        
+        // 显示下一个单词
+        function showNextWord() {
+            if (currentIndex < wordList.length - 1) {
+                currentIndex++;
+                updateFlashcard();
+            }
+        }
+        
+        // 标记为认识（复习模式）
+        function markAsKnown() {
+            if (wordList.length === 0) return;
+            
+            const currentWord = wordList[currentIndex].word;
+            const progress = wordProgress[currentWord] || { stage: 0, nextReview: 0, lastReviewed: 0 };
+            
+            // 更新复习进度
+            const now = Date.now();
+            progress.lastReviewed = now;
+            
+            if (progress.stage < reviewIntervals.length) {
+                progress.stage++;
+                progress.nextReview = now + reviewIntervals[progress.stage - 1] * 60 * 60 * 1000;
+            } else {
+                progress.stage = 6; // 已掌握
+                progress.nextReview = Number.MAX_SAFE_INTEGER;
+            }
+            
+            wordProgress[currentWord] = progress;
+            localStorage.setItem('wordProgress', JSON.stringify(wordProgress));
+            
+            // 移动到下一个单词
+            showNextReviewWord();
+        }
+        
+        // 标记为不认识（复习模式）
+        function markAsUnknown() {
+            if (wordList.length === 0) return;
+            
+            const currentWord = wordList[currentIndex].word;
+            const progress = wordProgress[currentWord] || { stage: 0, nextReview: 0, lastReviewed: 0 };
+            
+            // 重置复习进度
+            const now = Date.now();
+            progress.lastReviewed = now;
+            progress.stage = 1;
+            progress.nextReview = now + reviewIntervals[0] * 60 * 60 * 1000;
+            
+            wordProgress[currentWord] = progress;
+            localStorage.setItem('wordProgress', JSON.stringify(wordProgress));
+            
+            // 移动到下一个单词
+            showNextReviewWord();
+        }
+        
+        // 显示下一个需要复习的单词
+        function showNextReviewWord() {
+            const now = Date.now();
+            let nextIndex = -1;
+            
+            // 从当前位置向后查找需要复习的单词
+            for (let i = currentIndex + 1; i < wordList.length; i++) {
+                const word = wordList[i].word;
+                const progress = wordProgress[word] || { stage: 0, nextReview: 0 };
+                
+                if (progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now) {
+                    nextIndex = i;
+                    break;
+                }
+            }
+            
+            // 如果后面没有，从开头查找
+            if (nextIndex === -1) {
+                for (let i = 0; i < currentIndex; i++) {
+                    const word = wordList[i].word;
+                    const progress = wordProgress[word] || { stage: 0, nextReview: 0 };
+                    
+                    if (progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now) {
+                        nextIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (nextIndex !== -1) {
+                currentIndex = nextIndex;
+                updateFlashcard();
+            } else {
+                alert('恭喜！所有需要复习的单词都已经完成！');
+                // 切换到闪卡学习模式
+                modeButtons[0].click();
+            }
+        }
+        
+        // 标记为已掌握
+        function markAsMastered() {
+            if (wordList.length === 0) return;
+            
+            const currentWord = wordList[currentIndex].word;
+            const progress = wordProgress[currentWord] || { stage: 0, nextReview: 0, lastReviewed: 0 };
+            
+            if (progress.stage === 6) {
+                // 取消掌握标记
+                progress.stage = 0;
+                progress.nextReview = 0;
+            } else {
+                // 标记为已掌握
+                progress.stage = 6;
+                progress.nextReview = Number.MAX_SAFE_INTEGER;
+                progress.lastReviewed = Date.now();
+            }
+            
+            wordProgress[currentWord] = progress;
+            localStorage.setItem('wordProgress', JSON.stringify(wordProgress));
+            
+            updateFlashcard();
+            updateProgress();
+            updateWordList();
+        }
+        
+        // 随机排序单词
+        function shuffleWords() {
+            if (wordList.length === 0) return;
+            
+            // Fisher-Yates 洗牌算法
+            for (let i = wordList.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [wordList[i], wordList[j]] = [wordList[j], wordList[i]];
+            }
+            
+            currentIndex = 0;
+            updateFlashcard();
+            updateWordList();
+        }
+        
+        // 导出单词列表
+        function exportWordList() {
+            if (wordList.length === 0) return;
+            
+            let content = "单词\t音标\t词性\t释义\t记忆方法\t掌握状态\t下次复习\n";
+            wordList.forEach(wordObj => {
+                const progress = wordProgress[wordObj.word] || { stage: 0, nextReview: 0 };
+                const isMastered = progress.stage === 6;
+                const nextReview = progress.nextReview > 0 ? new Date(progress.nextReview).toLocaleDateString() : '无需复习';
+                
+                content += `${wordObj.word}\t${wordObj.phonetic}\t${wordObj.pos}\t${wordObj.meaning}\t${wordObj.memory}\t${isMastered ? '已掌握' : '学习中'}\t${nextReview}\n`;
+            });
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '我的单词表.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // 更新学习进度
+        function updateProgress() {
+            const total = wordList.length;
+            let learned = 0;
+            let needReview = 0;
+            const now = Date.now();
+            
+            wordList.forEach(wordObj => {
+                const progress = wordProgress[wordObj.word] || { stage: 0, nextReview: 0 };
+                if (progress.stage === 6) {
+                    learned++;
+                } else if (progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now) {
+                    needReview++;
+                }
+            });
+            
+            learnedCount.textContent = learned;
+            totalCount.textContent = total;
+            reviewCount.textContent = needReview;
+            
+            const progress = total > 0 ? (learned / total) * 100 : 0;
+            progressBar.style.width = `${progress}%`;
+            masteryLevel.textContent = `${Math.round(progress)}%`;
+        }
+        
+        // 更新单词列表显示
+        function updateWordList() {
+            wordListContainer.innerHTML = '';
+            
+            if (wordList.length === 0) {
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无单词</p>';
+                return;
+            }
+            
+            const now = Date.now();
+            let displayWords = [];
+            
+            if (currentMode === 'review') {
+                // 复习模式：只显示需要复习的单词
+                displayWords = wordList.filter(wordObj => {
+                    const progress = wordProgress[wordObj.word] || { stage: 0, nextReview: 0 };
+                    return progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now;
+                });
+            } else {
+                // 其他模式：显示所有单词
+                displayWords = wordList;
+            }
+            
+            if (displayWords.length === 0 && currentMode === 'review') {
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无需要复习的单词</p>';
+                return;
+            }
+            
+            displayWords.forEach((wordObj, index) => {
+                const wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                
+                const progress = wordProgress[wordObj.word] || { stage: 0, nextReview: 0 };
+                const isMastered = progress.stage === 6;
+                const isCurrent = wordList.indexOf(wordObj) === currentIndex;
+                const needsReview = progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now;
+                
+                let statusClass = 'status-new';
+                if (isMastered) {
+                    statusClass = 'status-mastered';
+                } else if (needsReview) {
+                    statusClass = 'status-review';
+                } else if (progress.stage > 0) {
+                    statusClass = 'status-learning';
+                }
+                
+                wordItem.innerHTML = `
+                    <div>
+                        <span class="word-text ${isCurrent ? statusClass + ' current' : statusClass}">
+                            ${isCurrent ? '▶ ' : ''}${wordObj.word}
+                        </span>
+                        <div class="word-meaning">${wordObj.meaning.substring(0, 30)}${wordObj.meaning.length > 30 ? '...' : ''}</div>
+                        <div class="word-review-info">复习阶段: ${progress.stage}/6 | 下次复习: ${formatDate(new Date(progress.nextReview))}</div>
+                    </div>
+                    <span>${isMastered ? '✓' : (needsReview ? '!' : '')}</span>
+                `;
+                
+                wordItem.addEventListener('click', () => {
+                    currentIndex = wordList.indexOf(wordObj);
+                    updateFlashcard();
+                });
+                
+                wordListContainer.appendChild(wordItem);
+            });
+        }
+        
+        // 初始化
+        updateUIForMode();
+        updateFlashcard();
+        updateProgress();
+        updateWordList();
+    </script>
+</body>
+</html>
