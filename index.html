@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能单词记忆助手 - 默认加载c.txt</title>
+    <title>智能单词记忆助手</title>
     <style>
         * {
             margin: 0;
@@ -16,6 +16,7 @@
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         .container {
@@ -30,18 +31,43 @@
             padding: 20px;
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
         }
         
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
         }
         
         .subtitle {
             font-size: 1.2rem;
             opacity: 0.9;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(30deg);
         }
         
         .main-content {
@@ -54,18 +80,19 @@
             flex: 1;
             min-width: 300px;
             background-color: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
         
         .content-area {
             flex: 2;
             min-width: 300px;
             background-color: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
         
         .section-title {
@@ -74,72 +101,6 @@
             color: #2c3e50;
             border-bottom: 2px solid #f0f2f5;
             padding-bottom: 10px;
-        }
-        
-        .upload-area {
-            border: 2px dashed #6a11cb;
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .upload-area:hover {
-            background-color: #f8f9ff;
-            border-color: #2575fc;
-        }
-        
-        .upload-icon {
-            font-size: 3rem;
-            color: #6a11cb;
-            margin-bottom: 15px;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(106, 17, 203, 0.4);
-        }
-        
-        .btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 4px 10px rgba(245, 87, 108, 0.3);
-        }
-        
-        .btn-secondary:hover {
-            box-shadow: 0 6px 15px rgba(245, 87, 108, 0.4);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #4cd964 0%, #5ac8fa 100%);
-            box-shadow: 0 4px 10px rgba(76, 217, 100, 0.3);
-        }
-        
-        .btn-success:hover {
-            box-shadow: 0 6px 15px rgba(76, 217, 100, 0.4);
         }
         
         .mode-selector {
@@ -158,6 +119,9 @@
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .mode-btn:hover {
@@ -171,10 +135,59 @@
             color: #6a11cb;
         }
         
+        .mode-icon {
+            font-size: 1.2rem;
+        }
+        
+        .progress-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #6a11cb;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
         .flashcard {
             perspective: 1000px;
             width: 100%;
-            height: 350px;
+            height: 400px;
             margin: 0 auto 30px;
         }
         
@@ -202,7 +215,7 @@
             align-items: center;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
         }
         
@@ -218,31 +231,27 @@
             text-align: left;
         }
         
-        .word {
-            font-size: 3rem;
+        .question {
+            font-size: 1.8rem;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.4;
         }
         
-        .phonetic {
-            font-size: 1.5rem;
-            opacity: 0.9;
+        .answer {
+            font-size: 1.4rem;
+            line-height: 1.6;
             margin-bottom: 15px;
         }
         
-        .pos {
+        .topic {
             display: inline-block;
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 1rem;
             margin-bottom: 15px;
-        }
-        
-        .meaning {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            line-height: 1.5;
         }
         
         .memory-aid {
@@ -277,30 +286,91 @@
             margin-top: 20px;
         }
         
-        .progress-info {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-        
-        .progress {
-            height: 100%;
+        .btn {
+            display: inline-block;
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            border-radius: 5px;
-            transition: width 0.5s;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4cd964 0%, #5ac8fa 100%);
+            box-shadow: 0 4px 15px rgba(76, 217, 100, 0.3);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 6px 20px rgba(76, 217, 100, 0.4);
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .settings-panel {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            display: none;
+        }
+        
+        .upload-area {
+            border: 2px dashed #6a11cb;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            background-color: #f8f9ff;
+            border-color: #2575fc;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #6a11cb;
+            margin-bottom: 15px;
         }
         
         .word-list {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             margin-top: 20px;
             border: 1px solid #e9ecef;
@@ -314,6 +384,11 @@
             display: flex;
             justify-content: space-between;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .word-item:hover {
+            background-color: #f8f9fa;
         }
         
         .word-item:last-child {
@@ -374,16 +449,24 @@
                 flex-direction: column;
             }
             
-            .word {
-                font-size: 2.5rem;
+            .question {
+                font-size: 1.5rem;
             }
             
-            .meaning {
+            .answer {
                 font-size: 1.2rem;
             }
             
             .flashcard {
                 height: 400px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
             }
         }
     </style>
@@ -391,44 +474,75 @@
 <body>
     <div class="container">
         <header>
-            <h1>智能单词记忆助手</h1>
-            <p class="subtitle">默认加载c.txt文件 - 艾宾浩斯遗忘曲线复习系统</p>
+            <h1>智能问答记忆助手</h1>
+            <p class="subtitle">基于艾宾浩斯遗忘曲线的智能复习系统</p>
+            <button class="settings-btn" id="settingsBtn">⚙️</button>
         </header>
         
         <div class="main-content">
             <div class="sidebar">
-                <h2 class="section-title">单词文件</h2>
-                <div id="fileStatus" class="error-message" style="display: none;">
-                    无法加载c.txt文件，请手动上传单词文件
-                </div>
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📚</div>
-                    <p>点击或拖拽您的txt单词文件到这里</p>
-                    <p class="hint">支持格式：单词 音标 | 词性. 释义 记忆方法</p>
-                    <input type="file" id="fileInput" accept=".txt" style="display: none;">
-                </div>
-                
                 <h2 class="section-title">学习模式</h2>
                 <div class="mode-selector">
-                    <button class="mode-btn active" data-mode="flashcard">闪卡学习</button>
-                    <button class="mode-btn" data-mode="review">复习模式</button>
-                    <button class="mode-btn" data-mode="test">单词测试</button>
-                    <button class="mode-btn" data-mode="spelling">拼写练习</button>
+                    <button class="mode-btn active" data-mode="flashcard">
+                        <span class="mode-icon">🔄</span>
+                        <span>闪卡学习</span>
+                    </button>
+                    <button class="mode-btn" data-mode="review">
+                        <span class="mode-icon">📚</span>
+                        <span>复习模式</span>
+                    </button>
+                    <button class="mode-btn" data-mode="test">
+                        <span class="mode-icon">✏️</span>
+                        <span>问题测试</span>
+                    </button>
+                    <button class="mode-btn" data-mode="spelling">
+                        <span class="mode-icon">🔤</span>
+                        <span>拼写练习</span>
+                    </button>
                 </div>
                 
                 <h2 class="section-title">学习进度</h2>
                 <div class="progress-info">
-                    <p>已学习: <span id="learnedCount">0</span> / <span id="totalCount">0</span> 个单词</p>
+                    <p>已掌握: <span id="learnedCount">0</span> / <span id="totalCount">0</span> 个问题</p>
                     <div class="progress-bar">
                         <div class="progress" id="progressBar" style="width: 0%"></div>
                     </div>
                     <p>掌握程度: <span id="masteryLevel">0%</span></p>
-                    <p>待复习单词: <span id="reviewCount">0</span> 个</p>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="newCount">0</div>
+                            <div class="stat-label">新问题</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="reviewCount">0</div>
+                            <div class="stat-label">待复习</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="masteredCount">0</div>
+                            <div class="stat-label">已掌握</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <h2 class="section-title">单词列表</h2>
-                <div class="word-list" id="wordList">
-                    <p style="text-align: center; color: #6c757d;">正在加载单词...</p>
+                <div class="settings-panel" id="settingsPanel">
+                    <h2 class="section-title">设置</h2>
+                    
+                    <div id="fileStatus" class="error-message" style="display: none;">
+                        无法加载c.txt文件，请手动上传问答文件
+                    </div>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📚</div>
+                        <p>点击或拖拽您的问答文件到这里</p>
+                        <p class="hint">支持格式：问题,题目名称（题号）？,"答案：描述"</p>
+                        <input type="file" id="fileInput" accept=".txt" style="display: none;">
+                    </div>
+                    
+                    <h2 class="section-title">问题列表</h2>
+                    <div class="word-list" id="wordList">
+                        <p style="text-align: center; color: #6c757d;">正在加载问题...</p>
+                    </div>
                 </div>
             </div>
             
@@ -438,39 +552,38 @@
                 <div class="flashcard" id="flashcard">
                     <div class="flashcard-inner">
                         <div class="flashcard-front">
-                            <div class="word" id="wordFront">正在加载单词...</div>
+                            <div class="question" id="questionFront">正在加载问题...</div>
                             <div class="review-info" id="reviewInfoFront" style="display: none;"></div>
-                            <p class="hint">点击卡片查看详细信息</p>
+                            <p class="hint">点击卡片查看答案</p>
                         </div>
                         <div class="flashcard-back">
-                            <div class="word" id="wordBack">-</div>
-                            <div class="phonetic" id="wordPhonetic"></div>
-                            <div class="pos" id="wordPos"></div>
-                            <div class="meaning" id="wordMeaning">-</div>
-                            <div class="memory-aid" id="wordMemory"></div>
+                            <div class="question" id="questionBack">-</div>
+                            <div class="topic" id="questionTopic"></div>
+                            <div class="answer" id="questionAnswer">-</div>
+                            <div class="memory-aid" id="questionMemory"></div>
                             <div class="review-info" id="reviewInfoBack" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="card-controls">
-                    <button class="btn" id="prevBtn" disabled>上一个</button>
-                    <button class="btn" id="flipBtn">翻转卡片</button>
-                    <button class="btn" id="nextBtn" disabled>下一个</button>
+                    <button class="btn" id="prevBtn" disabled>◀ 上一个</button>
+                    <button class="btn" id="flipBtn">🔄 翻转卡片</button>
+                    <button class="btn" id="nextBtn" disabled>下一个 ▶</button>
                 </div>
                 
-                <div style="text-align: center; margin-top: 20px;">
+                <div class="action-buttons">
                     <button class="btn btn-success" id="markKnownBtn" style="display: none;">认识</button>
                     <button class="btn btn-secondary" id="markUnknownBtn" style="display: none;">不认识</button>
                     <button class="btn btn-secondary" id="markMasteredBtn" disabled>标记为已掌握</button>
                     <button class="btn" id="shuffleBtn" disabled>随机排序</button>
-                    <button class="btn" id="exportBtn" disabled>导出单词表</button>
+                    <button class="btn" id="exportBtn" disabled>导出问题表</button>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>单词记忆助手 &copy; 2025 - 默认加载c.txt文件</p>
+            <p>问答记忆助手 &copy; 2025 - 基于艾宾浩斯遗忘曲线</p>
         </footer>
     </div>
 
@@ -480,21 +593,23 @@
         let currentIndex = 0;
         let currentMode = 'flashcard';
         let wordProgress = JSON.parse(localStorage.getItem('wordProgress')) || {};
+        let flippedWords = new Set(); // 记录已经翻过面的单词
         
         // 艾宾浩斯遗忘曲线复习间隔（小时）
         const reviewIntervals = [1, 24, 72, 168, 336, 720]; // 1小时, 1天, 3天, 7天, 14天, 30天
         
         // DOM元素
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const fileStatus = document.getElementById('fileStatus');
         const flashcard = document.getElementById('flashcard');
-        const wordFront = document.getElementById('wordFront');
-        const wordBack = document.getElementById('wordBack');
-        const wordPhonetic = document.getElementById('wordPhonetic');
-        const wordPos = document.getElementById('wordPos');
-        const wordMeaning = document.getElementById('wordMeaning');
-        const wordMemory = document.getElementById('wordMemory');
+        const questionFront = document.getElementById('questionFront');
+        const questionBack = document.getElementById('questionBack');
+        const questionTopic = document.getElementById('questionTopic');
+        const questionAnswer = document.getElementById('questionAnswer');
+        const questionMemory = document.getElementById('questionMemory');
         const reviewInfoFront = document.getElementById('reviewInfoFront');
         const reviewInfoBack = document.getElementById('reviewInfoBack');
         const prevBtn = document.getElementById('prevBtn');
@@ -508,6 +623,8 @@
         const learnedCount = document.getElementById('learnedCount');
         const totalCount = document.getElementById('totalCount');
         const reviewCount = document.getElementById('reviewCount');
+        const newCount = document.getElementById('newCount');
+        const masteredCount = document.getElementById('masteredCount');
         const progressBar = document.getElementById('progressBar');
         const masteryLevel = document.getElementById('masteryLevel');
         const wordListContainer = document.getElementById('wordList');
@@ -532,12 +649,16 @@
             } catch (error) {
                 console.error('无法加载c.txt文件:', error);
                 fileStatus.style.display = 'block';
-                wordFront.textContent = '无法加载c.txt文件';
-                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">请手动上传单词文件</p>';
+                questionFront.textContent = '无法加载c.txt文件';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">请手动上传问答文件</p>';
             }
         }
         
         // 事件监听
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+        });
+        
         uploadArea.addEventListener('click', () => fileInput.click());
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -565,11 +686,23 @@
         });
         
         flashcard.addEventListener('click', () => {
+            const wasFlipped = flashcard.classList.contains('flipped');
             flashcard.classList.toggle('flipped');
+            
+            // 如果是从正面翻到背面，标记为已翻面
+            if (!wasFlipped && flashcard.classList.contains('flipped')) {
+                markWordAsFlipped();
+            }
         });
         
         flipBtn.addEventListener('click', () => {
+            const wasFlipped = flashcard.classList.contains('flipped');
             flashcard.classList.toggle('flipped');
+            
+            // 如果是从正面翻到背面，标记为已翻面
+            if (!wasFlipped && flashcard.classList.contains('flipped')) {
+                markWordAsFlipped();
+            }
         });
         
         prevBtn.addEventListener('click', showPreviousWord);
@@ -601,7 +734,7 @@
             const titles = {
                 'flashcard': '闪卡学习',
                 'review': '复习模式',
-                'test': '单词测试',
+                'test': '问题测试',
                 'spelling': '拼写练习'
             };
             return titles[mode] || '学习模式';
@@ -635,7 +768,7 @@
             reader.readAsText(file);
         }
         
-        // 处理单词内容 - 适配新格式
+        // 处理问答内容 - 适配新格式
         function processWordContent(content) {
             const lines = content.split('\n');
             wordList = [];
@@ -643,8 +776,8 @@
             lines.forEach(line => {
                 line = line.trim();
                 if (line) {
-                    // 解析格式：单词 音标 | 词性. 释义 记忆方法
-                    const wordData = parseWordLine(line);
+                    // 解析格式：问题,题目名称（题号）？,"答案：描述"
+                    const wordData = parseQuestionLine(line);
                     if (wordData) {
                         wordList.push(wordData);
                     }
@@ -662,87 +795,96 @@
                 shuffleBtn.disabled = false;
                 exportBtn.disabled = false;
                 
-                alert(`成功加载 ${wordList.length} 个单词`);
+                alert(`成功加载 ${wordList.length} 个问答`);
             } else {
-                alert('未找到有效的单词数据，请检查文件格式');
+                alert('未找到有效的问答数据，请检查文件格式');
             }
         }
         
-        // 解析单词行数据
-        function parseWordLine(line) {
-            // 格式：单词 音标 | 词性. 释义 记忆方法
-            const parts = line.split('\t');
-            if (parts.length < 2) return null;
+        // 解析问答行数据
+        function parseQuestionLine(line) {
+            // 格式：问题,题目名称（题号）？,"答案：描述"
+            const parts = line.split(',');
+            if (parts.length < 3) return null;
             
-            const word = parts[0].trim();
-            const rest = parts[1].trim();
+            const topic = parts[0].trim();
+            const question = parts[1].trim();
+            let answer = parts.slice(2).join(',').trim(); // 处理答案中可能包含逗号的情况
             
-            // 分离音标和词性释义部分
-            const phoneticAndPos = rest.split(' | ');
-            if (phoneticAndPos.length < 2) return null;
+            // 去掉答案的首尾引号
+            if (answer.startsWith('"') && answer.endsWith('"')) {
+                answer = answer.substring(1, answer.length - 1);
+            }
             
-            const phonetic = phoneticAndPos[0].trim();
-            const posAndMeaning = phoneticAndPos[1].trim();
-            
-            // 分离词性和释义
-            const posMatch = posAndMeaning.match(/^(\w+\.)\s+(.+)$/);
-            if (!posMatch) return null;
-            
-            const pos = posMatch[1];
-            const meaningAndMemory = posMatch[2];
-            
-            // 分离释义和记忆方法
-            let meaning = meaningAndMemory;
-            let memory = '';
-            
-            // 尝试分离记忆方法（如果有制表符分隔）
-            if (parts.length > 2) {
-                memory = parts[2].trim();
-            } else {
-                // 如果没有制表符分隔，尝试在释义中查找记忆方法
-                const memoryIndex = meaningAndMemory.indexOf('\t');
-                if (memoryIndex !== -1) {
-                    meaning = meaningAndMemory.substring(0, memoryIndex).trim();
-                    memory = meaningAndMemory.substring(memoryIndex + 1).trim();
-                }
+            // 从问题中提取题号
+            let questionNumber = '';
+            const numberMatch = question.match(/（(\d+)）/);
+            if (numberMatch) {
+                questionNumber = numberMatch[1];
             }
             
             return {
-                word: word,
-                phonetic: phonetic,
-                pos: pos,
-                meaning: meaning,
-                memory: memory
+                word: question,
+                topic: topic,
+                number: questionNumber,
+                answer: answer,
+                memory: '' // 可以留空或用于其他用途
             };
+        }
+        
+        // 标记单词为已翻面（即进入复习系统）
+        function markWordAsFlipped() {
+            if (wordList.length === 0) return;
+            
+            const currentWord = wordList[currentIndex].word;
+            const progress = wordProgress[currentWord] || { stage: 0, nextReview: 0, lastReviewed: 0 };
+            
+            // 只有当单词尚未进入复习系统时，才将其标记为不熟悉
+            if (progress.stage === 0) {
+                const now = Date.now();
+                progress.stage = 1;
+                progress.nextReview = now + reviewIntervals[0] * 60 * 60 * 1000; // 1小时后
+                progress.lastReviewed = now;
+                
+                wordProgress[currentWord] = progress;
+                localStorage.setItem('wordProgress', JSON.stringify(wordProgress));
+                
+                // 记录这个单词已经被翻过面
+                flippedWords.add(currentWord);
+                
+                // 更新进度和单词列表
+                updateProgress();
+                updateWordList();
+                
+                console.log(`问题 "${currentWord}" 已标记为不熟悉，进入复习系统`);
+            }
         }
         
         // 更新闪卡内容
         function updateFlashcard() {
             if (wordList.length === 0) {
-                wordFront.textContent = '请上传单词文件';
-                wordBack.textContent = '-';
-                wordPhonetic.textContent = '';
-                wordPos.textContent = '';
-                wordMeaning.textContent = '-';
-                wordMemory.textContent = '';
+                questionFront.textContent = '请上传问答文件';
+                questionBack.textContent = '-';
+                questionTopic.textContent = '';
+                questionAnswer.textContent = '-';
+                questionMemory.textContent = '';
                 reviewInfoFront.textContent = '';
                 reviewInfoBack.textContent = '';
                 return;
             }
             
             const currentWord = wordList[currentIndex];
-            wordFront.textContent = currentWord.word;
-            wordBack.textContent = currentWord.word;
-            wordPhonetic.textContent = currentWord.phonetic;
-            wordPos.textContent = currentWord.pos;
-            wordMeaning.textContent = currentWord.meaning;
-            wordMemory.textContent = currentWord.memory;
+            questionFront.textContent = currentWord.word;
+            questionBack.textContent = currentWord.word;
+            questionTopic.textContent = currentWord.topic;
+            questionAnswer.textContent = currentWord.answer;
+            questionMemory.textContent = currentWord.memory;
             
             // 如果没有记忆方法，隐藏该部分
             if (!currentWord.memory) {
-                wordMemory.style.display = 'none';
+                questionMemory.style.display = 'none';
             } else {
-                wordMemory.style.display = 'block';
+                questionMemory.style.display = 'block';
             }
             
             // 更新复习信息
@@ -885,7 +1027,7 @@
                 currentIndex = nextIndex;
                 updateFlashcard();
             } else {
-                alert('恭喜！所有需要复习的单词都已经完成！');
+                alert('恭喜！所有需要复习的问题都已经完成！');
                 // 切换到闪卡学习模式
                 modeButtons[0].click();
             }
@@ -936,20 +1078,20 @@
         function exportWordList() {
             if (wordList.length === 0) return;
             
-            let content = "单词\t音标\t词性\t释义\t记忆方法\t掌握状态\t下次复习\n";
+            let content = "问题,题目,答案,掌握状态,下次复习\n";
             wordList.forEach(wordObj => {
                 const progress = wordProgress[wordObj.word] || { stage: 0, nextReview: 0 };
                 const isMastered = progress.stage === 6;
                 const nextReview = progress.nextReview > 0 ? new Date(progress.nextReview).toLocaleDateString() : '无需复习';
                 
-                content += `${wordObj.word}\t${wordObj.phonetic}\t${wordObj.pos}\t${wordObj.meaning}\t${wordObj.memory}\t${isMastered ? '已掌握' : '学习中'}\t${nextReview}\n`;
+                content += `${wordObj.topic},${wordObj.word},${wordObj.answer},${isMastered ? '已掌握' : '学习中'},${nextReview}\n`;
             });
             
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = '我的单词表.txt';
+            a.download = '我的问答表.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -961,6 +1103,7 @@
             const total = wordList.length;
             let learned = 0;
             let needReview = 0;
+            let newWords = 0;
             const now = Date.now();
             
             wordList.forEach(wordObj => {
@@ -969,12 +1112,16 @@
                     learned++;
                 } else if (progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now) {
                     needReview++;
+                } else if (progress.stage === 0) {
+                    newWords++;
                 }
             });
             
             learnedCount.textContent = learned;
             totalCount.textContent = total;
             reviewCount.textContent = needReview;
+            newCount.textContent = newWords;
+            masteredCount.textContent = learned;
             
             const progress = total > 0 ? (learned / total) * 100 : 0;
             progressBar.style.width = `${progress}%`;
@@ -986,7 +1133,7 @@
             wordListContainer.innerHTML = '';
             
             if (wordList.length === 0) {
-                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无单词</p>';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无问题</p>';
                 return;
             }
             
@@ -1005,7 +1152,7 @@
             }
             
             if (displayWords.length === 0 && currentMode === 'review') {
-                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无需要复习的单词</p>';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无需要复习的问题</p>';
                 return;
             }
             
@@ -1017,6 +1164,7 @@
                 const isMastered = progress.stage === 6;
                 const isCurrent = wordList.indexOf(wordObj) === currentIndex;
                 const needsReview = progress.stage > 0 && progress.stage < 6 && progress.nextReview <= now;
+                const isNew = progress.stage === 0;
                 
                 let statusClass = 'status-new';
                 if (isMastered) {
@@ -1032,10 +1180,10 @@
                         <span class="word-text ${isCurrent ? statusClass + ' current' : statusClass}">
                             ${isCurrent ? '▶ ' : ''}${wordObj.word}
                         </span>
-                        <div class="word-meaning">${wordObj.meaning.substring(0, 30)}${wordObj.meaning.length > 30 ? '...' : ''}</div>
+                        <div class="word-meaning">${wordObj.answer.substring(0, 30)}${wordObj.answer.length > 30 ? '...' : ''}</div>
                         <div class="word-review-info">复习阶段: ${progress.stage}/6 | 下次复习: ${formatDate(new Date(progress.nextReview))}</div>
                     </div>
-                    <span>${isMastered ? '✓' : (needsReview ? '!' : '')}</span>
+                    <span>${isMastered ? '✓' : (needsReview ? '!' : (isNew ? '🆕' : ''))}</span>
                 `;
                 
                 wordItem.addEventListener('click', () => {
