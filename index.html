@@ -231,27 +231,31 @@
             text-align: left;
         }
         
-        .question {
-            font-size: 1.8rem;
+        .word {
+            font-size: 3rem;
             font-weight: bold;
             margin-bottom: 10px;
-            text-align: center;
-            line-height: 1.4;
         }
         
-        .answer {
-            font-size: 1.4rem;
-            line-height: 1.6;
+        .phonetic {
+            font-size: 1.5rem;
+            opacity: 0.9;
             margin-bottom: 15px;
         }
         
-        .topic {
+        .pos {
             display: inline-block;
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 1rem;
             margin-bottom: 15px;
+        }
+        
+        .meaning {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
         
         .memory-aid {
@@ -449,11 +453,11 @@
                 flex-direction: column;
             }
             
-            .question {
-                font-size: 1.5rem;
+            .word {
+                font-size: 2.5rem;
             }
             
-            .answer {
+            .meaning {
                 font-size: 1.2rem;
             }
             
@@ -474,7 +478,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>智能问答记忆助手</h1>
+            <h1>智能单词记忆助手</h1>
             <p class="subtitle">基于艾宾浩斯遗忘曲线的智能复习系统</p>
             <button class="settings-btn" id="settingsBtn">⚙️</button>
         </header>
@@ -493,7 +497,7 @@
                     </button>
                     <button class="mode-btn" data-mode="test">
                         <span class="mode-icon">✏️</span>
-                        <span>问题测试</span>
+                        <span>单词测试</span>
                     </button>
                     <button class="mode-btn" data-mode="spelling">
                         <span class="mode-icon">🔤</span>
@@ -503,7 +507,7 @@
                 
                 <h2 class="section-title">学习进度</h2>
                 <div class="progress-info">
-                    <p>已掌握: <span id="learnedCount">0</span> / <span id="totalCount">0</span> 个问题</p>
+                    <p>已学习: <span id="learnedCount">0</span> / <span id="totalCount">0</span> 个单词</p>
                     <div class="progress-bar">
                         <div class="progress" id="progressBar" style="width: 0%"></div>
                     </div>
@@ -512,7 +516,7 @@
                     <div class="stats">
                         <div class="stat-item">
                             <div class="stat-value" id="newCount">0</div>
-                            <div class="stat-label">新问题</div>
+                            <div class="stat-label">新单词</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-value" id="reviewCount">0</div>
@@ -529,19 +533,19 @@
                     <h2 class="section-title">设置</h2>
                     
                     <div id="fileStatus" class="error-message" style="display: none;">
-                        无法加载c.txt文件，请手动上传问答文件
+                        无法加载c.txt文件，请手动上传单词文件
                     </div>
                     
                     <div class="upload-area" id="uploadArea">
                         <div class="upload-icon">📚</div>
-                        <p>点击或拖拽您的问答文件到这里</p>
-                        <p class="hint">支持格式：问题,题目名称（题号）？,"答案：描述"</p>
+                        <p>点击或拖拽您的txt单词文件到这里</p>
+                        <p class="hint">支持格式：单词 音标 | 词性. 释义 记忆方法</p>
                         <input type="file" id="fileInput" accept=".txt" style="display: none;">
                     </div>
                     
-                    <h2 class="section-title">问题列表</h2>
+                    <h2 class="section-title">单词列表</h2>
                     <div class="word-list" id="wordList">
-                        <p style="text-align: center; color: #6c757d;">正在加载问题...</p>
+                        <p style="text-align: center; color: #6c757d;">正在加载单词...</p>
                     </div>
                 </div>
             </div>
@@ -552,15 +556,16 @@
                 <div class="flashcard" id="flashcard">
                     <div class="flashcard-inner">
                         <div class="flashcard-front">
-                            <div class="question" id="questionFront">正在加载问题...</div>
+                            <div class="word" id="wordFront">正在加载单词...</div>
                             <div class="review-info" id="reviewInfoFront" style="display: none;"></div>
-                            <p class="hint">点击卡片查看答案</p>
+                            <p class="hint">点击卡片查看详细信息</p>
                         </div>
                         <div class="flashcard-back">
-                            <div class="question" id="questionBack">-</div>
-                            <div class="topic" id="questionTopic"></div>
-                            <div class="answer" id="questionAnswer">-</div>
-                            <div class="memory-aid" id="questionMemory"></div>
+                            <div class="word" id="wordBack">-</div>
+                            <div class="phonetic" id="wordPhonetic"></div>
+                            <div class="pos" id="wordPos"></div>
+                            <div class="meaning" id="wordMeaning">-</div>
+                            <div class="memory-aid" id="wordMemory"></div>
                             <div class="review-info" id="reviewInfoBack" style="display: none;"></div>
                         </div>
                     </div>
@@ -577,13 +582,13 @@
                     <button class="btn btn-secondary" id="markUnknownBtn" style="display: none;">不认识</button>
                     <button class="btn btn-secondary" id="markMasteredBtn" disabled>标记为已掌握</button>
                     <button class="btn" id="shuffleBtn" disabled>随机排序</button>
-                    <button class="btn" id="exportBtn" disabled>导出问题表</button>
+                    <button class="btn" id="exportBtn" disabled>导出单词表</button>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>问答记忆助手 &copy; 2025 - 基于艾宾浩斯遗忘曲线</p>
+            <p>单词记忆助手 &copy; 2025 - 基于艾宾浩斯遗忘曲线</p>
         </footer>
     </div>
 
@@ -605,11 +610,12 @@
         const fileInput = document.getElementById('fileInput');
         const fileStatus = document.getElementById('fileStatus');
         const flashcard = document.getElementById('flashcard');
-        const questionFront = document.getElementById('questionFront');
-        const questionBack = document.getElementById('questionBack');
-        const questionTopic = document.getElementById('questionTopic');
-        const questionAnswer = document.getElementById('questionAnswer');
-        const questionMemory = document.getElementById('questionMemory');
+        const wordFront = document.getElementById('wordFront');
+        const wordBack = document.getElementById('wordBack');
+        const wordPhonetic = document.getElementById('wordPhonetic');
+        const wordPos = document.getElementById('wordPos');
+        const wordMeaning = document.getElementById('wordMeaning');
+        const wordMemory = document.getElementById('wordMemory');
         const reviewInfoFront = document.getElementById('reviewInfoFront');
         const reviewInfoBack = document.getElementById('reviewInfoBack');
         const prevBtn = document.getElementById('prevBtn');
@@ -649,8 +655,8 @@
             } catch (error) {
                 console.error('无法加载c.txt文件:', error);
                 fileStatus.style.display = 'block';
-                questionFront.textContent = '无法加载c.txt文件';
-                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">请手动上传问答文件</p>';
+                wordFront.textContent = '无法加载c.txt文件';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">请手动上传单词文件</p>';
             }
         }
         
@@ -734,7 +740,7 @@
             const titles = {
                 'flashcard': '闪卡学习',
                 'review': '复习模式',
-                'test': '问题测试',
+                'test': '单词测试',
                 'spelling': '拼写练习'
             };
             return titles[mode] || '学习模式';
@@ -768,7 +774,7 @@
             reader.readAsText(file);
         }
         
-        // 处理问答内容 - 适配新格式
+        // 处理单词内容 - 适配新格式
         function processWordContent(content) {
             const lines = content.split('\n');
             wordList = [];
@@ -776,8 +782,8 @@
             lines.forEach(line => {
                 line = line.trim();
                 if (line) {
-                    // 解析格式：问题,题目名称（题号）？,"答案：描述"
-                    const wordData = parseQuestionLine(line);
+                    // 解析格式：单词 音标 | 词性. 释义 记忆方法
+                    const wordData = parseWordLine(line);
                     if (wordData) {
                         wordList.push(wordData);
                     }
@@ -795,40 +801,57 @@
                 shuffleBtn.disabled = false;
                 exportBtn.disabled = false;
                 
-                alert(`成功加载 ${wordList.length} 个问答`);
+                alert(`成功加载 ${wordList.length} 个单词`);
             } else {
-                alert('未找到有效的问答数据，请检查文件格式');
+                alert('未找到有效的单词数据，请检查文件格式');
             }
         }
         
-        // 解析问答行数据
-        function parseQuestionLine(line) {
-            // 格式：问题,题目名称（题号）？,"答案：描述"
-            const parts = line.split(',');
-            if (parts.length < 3) return null;
+        // 解析单词行数据
+        function parseWordLine(line) {
+            // 格式：单词 音标 | 词性. 释义 记忆方法
+            const parts = line.split('\t');
+            if (parts.length < 2) return null;
             
-            const topic = parts[0].trim();
-            const question = parts[1].trim();
-            let answer = parts.slice(2).join(',').trim(); // 处理答案中可能包含逗号的情况
+            const word = parts[0].trim();
+            const rest = parts[1].trim();
             
-            // 去掉答案的首尾引号
-            if (answer.startsWith('"') && answer.endsWith('"')) {
-                answer = answer.substring(1, answer.length - 1);
-            }
+            // 分离音标和词性释义部分
+            const phoneticAndPos = rest.split(' | ');
+            if (phoneticAndPos.length < 2) return null;
             
-            // 从问题中提取题号
-            let questionNumber = '';
-            const numberMatch = question.match(/（(\d+)）/);
-            if (numberMatch) {
-                questionNumber = numberMatch[1];
+            const phonetic = phoneticAndPos[0].trim();
+            const posAndMeaning = phoneticAndPos[1].trim();
+            
+            // 分离词性和释义
+            const posMatch = posAndMeaning.match(/^(\w+\.)\s+(.+)$/);
+            if (!posMatch) return null;
+            
+            const pos = posMatch[1];
+            const meaningAndMemory = posMatch[2];
+            
+            // 分离释义和记忆方法
+            let meaning = meaningAndMemory;
+            let memory = '';
+            
+            // 尝试分离记忆方法（如果有制表符分隔）
+            if (parts.length > 2) {
+                memory = parts[2].trim();
+            } else {
+                // 如果没有制表符分隔，尝试在释义中查找记忆方法
+                const memoryIndex = meaningAndMemory.indexOf('\t');
+                if (memoryIndex !== -1) {
+                    meaning = meaningAndMemory.substring(0, memoryIndex).trim();
+                    memory = meaningAndMemory.substring(memoryIndex + 1).trim();
+                }
             }
             
             return {
-                word: question,
-                topic: topic,
-                number: questionNumber,
-                answer: answer,
-                memory: '' // 可以留空或用于其他用途
+                word: word,
+                phonetic: phonetic,
+                pos: pos,
+                meaning: meaning,
+                memory: memory
             };
         }
         
@@ -856,35 +879,37 @@
                 updateProgress();
                 updateWordList();
                 
-                console.log(`问题 "${currentWord}" 已标记为不熟悉，进入复习系统`);
+                console.log(`单词 "${currentWord}" 已标记为不熟悉，进入复习系统`);
             }
         }
         
         // 更新闪卡内容
         function updateFlashcard() {
             if (wordList.length === 0) {
-                questionFront.textContent = '请上传问答文件';
-                questionBack.textContent = '-';
-                questionTopic.textContent = '';
-                questionAnswer.textContent = '-';
-                questionMemory.textContent = '';
+                wordFront.textContent = '请上传单词文件';
+                wordBack.textContent = '-';
+                wordPhonetic.textContent = '';
+                wordPos.textContent = '';
+                wordMeaning.textContent = '-';
+                wordMemory.textContent = '';
                 reviewInfoFront.textContent = '';
                 reviewInfoBack.textContent = '';
                 return;
             }
             
             const currentWord = wordList[currentIndex];
-            questionFront.textContent = currentWord.word;
-            questionBack.textContent = currentWord.word;
-            questionTopic.textContent = currentWord.topic;
-            questionAnswer.textContent = currentWord.answer;
-            questionMemory.textContent = currentWord.memory;
+            wordFront.textContent = currentWord.word;
+            wordBack.textContent = currentWord.word;
+            wordPhonetic.textContent = currentWord.phonetic;
+            wordPos.textContent = currentWord.pos;
+            wordMeaning.textContent = currentWord.meaning;
+            wordMemory.textContent = currentWord.memory;
             
             // 如果没有记忆方法，隐藏该部分
             if (!currentWord.memory) {
-                questionMemory.style.display = 'none';
+                wordMemory.style.display = 'none';
             } else {
-                questionMemory.style.display = 'block';
+                wordMemory.style.display = 'block';
             }
             
             // 更新复习信息
@@ -1027,7 +1052,7 @@
                 currentIndex = nextIndex;
                 updateFlashcard();
             } else {
-                alert('恭喜！所有需要复习的问题都已经完成！');
+                alert('恭喜！所有需要复习的单词都已经完成！');
                 // 切换到闪卡学习模式
                 modeButtons[0].click();
             }
@@ -1078,20 +1103,20 @@
         function exportWordList() {
             if (wordList.length === 0) return;
             
-            let content = "问题,题目,答案,掌握状态,下次复习\n";
+            let content = "单词\t音标\t词性\t释义\t记忆方法\t掌握状态\t下次复习\n";
             wordList.forEach(wordObj => {
                 const progress = wordProgress[wordObj.word] || { stage: 0, nextReview: 0 };
                 const isMastered = progress.stage === 6;
                 const nextReview = progress.nextReview > 0 ? new Date(progress.nextReview).toLocaleDateString() : '无需复习';
                 
-                content += `${wordObj.topic},${wordObj.word},${wordObj.answer},${isMastered ? '已掌握' : '学习中'},${nextReview}\n`;
+                content += `${wordObj.word}\t${wordObj.phonetic}\t${wordObj.pos}\t${wordObj.meaning}\t${wordObj.memory}\t${isMastered ? '已掌握' : '学习中'}\t${nextReview}\n`;
             });
             
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = '我的问答表.csv';
+            a.download = '我的单词表.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1133,7 +1158,7 @@
             wordListContainer.innerHTML = '';
             
             if (wordList.length === 0) {
-                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无问题</p>';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无单词</p>';
                 return;
             }
             
@@ -1152,7 +1177,7 @@
             }
             
             if (displayWords.length === 0 && currentMode === 'review') {
-                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无需要复习的问题</p>';
+                wordListContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">暂无需要复习的单词</p>';
                 return;
             }
             
@@ -1180,7 +1205,7 @@
                         <span class="word-text ${isCurrent ? statusClass + ' current' : statusClass}">
                             ${isCurrent ? '▶ ' : ''}${wordObj.word}
                         </span>
-                        <div class="word-meaning">${wordObj.answer.substring(0, 30)}${wordObj.answer.length > 30 ? '...' : ''}</div>
+                        <div class="word-meaning">${wordObj.meaning.substring(0, 30)}${wordObj.meaning.length > 30 ? '...' : ''}</div>
                         <div class="word-review-info">复习阶段: ${progress.stage}/6 | 下次复习: ${formatDate(new Date(progress.nextReview))}</div>
                     </div>
                     <span>${isMastered ? '✓' : (needsReview ? '!' : (isNew ? '🆕' : ''))}</span>
